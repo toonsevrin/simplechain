@@ -9,7 +9,7 @@ import (
 type Block struct {
 	Index uint32//32bit
 	PreviousHash *[32]byte//256bit
-	Timestamp uint64//64 bit
+	Timestamp int64//64 bit
 	Hash *[32]byte//256bit
 	Data string//unlimited
 }
