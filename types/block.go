@@ -7,27 +7,26 @@ import (
 )
 
 type Block struct {
-	index uint//32bit
-	previousHash [32]byte//256bit
+	index uint32//32bit
+	previousHash *[32]byte//256bit
 	timestamp uint64//64 bit
-	hash [32]byte//256bit
+	hash *[32]byte//256bit
 	data string//unlimited
 }
 
-func (block *Block) Hash() [32]byte{
+func (block *Block) Hash() *[32]byte{
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, block.index)
 	binary.Write(buf, binary.LittleEndian, block.previousHash)
 	binary.Write(buf, binary.LittleEndian, block.timestamp)
-	binary.Write(buf, binary.LittleEndian, block.hash)
-	binary.Write(buf, binary.LittleEndian, block.data)
+	binary.Write(buf, binary.LittleEndian, []byte(block.data))
 
 	res := sha256.Sum256(buf.Bytes())
-	return res
+	return &res
 }
 
 func GetGenesis() Block {
-	block := Block{0, [32]byte{}, 1502089655, [32]byte{}, "This is the genesis block!"}
+	block := Block{index: 0, previousHash: &[32]byte{}, timestamp: 1502089655, hash: &[32]byte{}, data: "This is the genesis block!"}
 	block.hash = block.Hash()
 	return block
 }
