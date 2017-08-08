@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"bytes"
+	"encoding/json"
 )
 
 //func TestBlock_Hash(t *testing.T) {
@@ -36,4 +37,13 @@ func TestBlock_IsValid(t *testing.T) {
 	assert.False(t, falseBlock.IsValid())
 	falseBlock.Hash = *falseBlock.GenerateHash()
 	assert.True(t, falseBlock.IsValid())
+}
+
+func TestJsonParsing(t *testing.T){
+    genesis := GetGenesis()
+	bytes, err := json.Marshal(genesis)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, `{"Index":0,"PreviousHash":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","Timestamp":1502089655,"Hash":"3HrtpJqhKq2UPoM6lpYop/ZcUR8br3Etym5JcJJ+H1A=","Data":"This is the genesis block!"}`, string(bytes))
 }
