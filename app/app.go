@@ -18,7 +18,7 @@ func (app *App) createNextBlock(data string) types.Block {
 }
 
 func (app *App) isValidNewBlock(block types.Block) bool{
-	return block.IsValid() && bytes.Equal(block.PreviousHash[:], app.getLatestBlock().Hash[:]) && app.getLatestBlock().Index + 1 == block.Index
+	return block.IsValid() && bytes.Equal(block.PreviousHash[:], (&app.getLatestBlock().Hash)[:]) && app.getLatestBlock().Index + 1 == block.Index
 }
 
 func (app *App) getLatestBlock() types.Block {
