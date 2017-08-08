@@ -10,9 +10,9 @@ func main(){
 
 }
 
-func createNextBlock(data string) *types.Block {
-	//previous := getLatestBlock()
-}
+//func createNextBlock(data string) *types.Block {
+//	previous := getLatestBlock()
+//}
 
 func getLatestBlock() types.Block {
 	return blockchain[len(blockchain)-1]
