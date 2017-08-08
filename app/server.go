@@ -9,7 +9,7 @@ import (
 type Server struct {
 	App App
 }
-func (server *Server) init(){
+func (server *Server) Init(){
 	router := mux.NewRouter().StrictSlash(true)
 	router.Methods("GET").Path("/blocks").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		json.NewEncoder(writer).Encode(server.App.Blockchain)
