@@ -27,7 +27,7 @@ func (block *Block) Hash() [32]byte{
 }
 
 func GetGenesis() Block {
-	block := Block{0, nil, 1502089655, nil, "This is the genesis block!"}
+	block := Block{0, [32]byte{}, 1502089655, [32]byte{}, "This is the genesis block!"}
 	block.hash = block.Hash()
 	return block
 }
