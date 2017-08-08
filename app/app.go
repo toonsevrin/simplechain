@@ -12,8 +12,8 @@ type App struct {
 
 func (app *App) createNextBlock(data string) types.Block {
 	previous := app.getLatestBlock()
-	next := types.Block{Index: previous.Index, PreviousHash: previous.Hash, Timestamp: time.Now().Unix(), Hash: &[32]byte{}, Data: data}
-	next.Hash = next.GenerateHash();
+	next := types.Block{Index: previous.Index, PreviousHash: previous.Hash, Timestamp: time.Now().Unix(), Hash: [32]byte{}, Data: data}
+	next.Hash = *next.GenerateHash();
 	return next
 }
 
@@ -26,7 +26,7 @@ func (app *App) getLatestBlock() types.Block {
 }
 
 func (app *App) isValidChain(chain []types.Block) bool{
-	if chain[0].GenerateHash() != app.Blockchain[0].Hash {
+	if *chain[0].GenerateHash() != app.Blockchain[0].Hash {
 		return false
 	}
 	for i, block := range chain {
