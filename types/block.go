@@ -30,3 +30,9 @@ func GetGenesis() Block {
 	block.Hash = block.GenerateHash()
 	return block
 }
+
+func (block *Block) IsValid() bool{
+	return(bytes.Equal(block.GenerateHash()[:], block.Hash[:]))
+}
+
+
