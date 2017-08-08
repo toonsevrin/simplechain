@@ -44,7 +44,7 @@ func (app *App) isValidChain(chain []types.Block) bool{
 }
 
 func (app *App) pickLongestChain(newChain []types.Block)  {
-	if len(newChain) > len(app.Blockchain) && isValidChain(newChain) {
+	if len(newChain) > len(app.Blockchain) && app.isValidChain(newChain) {
 		fmt.Println("Received longer chain of length ", len(newChain))
 		app.Blockchain = newChain
 		//broadcast new chain
