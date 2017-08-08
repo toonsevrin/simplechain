@@ -16,24 +16,24 @@ import (
 
 func TestGetGenesis(t *testing.T) {
 	genesis := GetGenesis()
-	block := Block{PreviousHash: &[32]byte{0}, Timestamp: 1502089655, Hash: &[32]byte{}, Data: "This is the genesis block!"}
+	block := Block{PreviousHash: [32]byte{0}, Timestamp: 1502089655, Hash: [32]byte{}, Data: "This is the genesis block!"}
 	assert.True(t, bytes.Equal(genesis.Hash[:], block.GenerateHash()[:]))
-	block2 := Block{Index: 1, PreviousHash: &[32]byte{0}, Timestamp: 1502089655, Hash: &[32]byte{}, Data: "This is the genesis block!"}
+	block2 := Block{Index: 1, PreviousHash: [32]byte{0}, Timestamp: 1502089655, Hash: [32]byte{}, Data: "This is the genesis block!"}
 	assert.False(t, bytes.Equal(genesis.Hash[:], block2.GenerateHash()[:]))
-	block3 := Block{PreviousHash: &[32]byte{0}, Timestamp: 1502089656, Hash: &[32]byte{}, Data: "This is the genesis block!"}
+	block3 := Block{PreviousHash: [32]byte{0}, Timestamp: 1502089656, Hash: [32]byte{}, Data: "This is the genesis block!"}
 	assert.False(t, bytes.Equal(genesis.Hash[:], block3.GenerateHash()[:]))
-	block4 := Block{PreviousHash: &[32]byte{1}, Timestamp: 1502089655, Hash: &[32]byte{}, Data: "This is the genesis block!"}
+	block4 := Block{PreviousHash: [32]byte{1}, Timestamp: 1502089655, Hash: [32]byte{}, Data: "This is the genesis block!"}
 	assert.False(t, bytes.Equal(genesis.Hash[:], block4.GenerateHash()[:]))
-	block5 := Block{PreviousHash: &[32]byte{0}, Timestamp: 1502089655, Hash: &[32]byte{}, Data: "This is the genesis block!!"}
+	block5 := Block{PreviousHash: [32]byte{0}, Timestamp: 1502089655, Hash: [32]byte{}, Data: "This is the genesis block!!"}
 	assert.False(t, bytes.Equal(genesis.Hash[:], block5.GenerateHash()[:]))
 	assert.True(t, genesis.IsValid())
 }
 
 func TestBlock_IsValid(t *testing.T) {
-	falseBlock := Block{0, &[32]byte{}, 1502089565, &[32]byte{}, "test"}
+	falseBlock := Block{0, [32]byte{}, 1502089565, [32]byte{}, "test"}
 	assert.False(t, falseBlock.IsValid())
-	falseBlock.Hash = &[32]byte{8,3,4,6,1,2,3,1,8,7,1,8,0,11,1,2,3,5,6,1}
+	falseBlock.Hash = [32]byte{8,3,4,6,1,2,3,1,8,7,1,8,0,11,1,2,3,5,6,1}
 	assert.False(t, falseBlock.IsValid())
-	falseBlock.Hash = falseBlock.GenerateHash()
+	falseBlock.Hash = *falseBlock.GenerateHash()
 	assert.True(t, falseBlock.IsValid())
 }

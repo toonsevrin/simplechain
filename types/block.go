@@ -14,25 +14,28 @@ type Block struct {
 	Data string//unlimited
 }
 
-func (block *Block) GenerateHash() *[32]byte{
+
+func (block *Block) GenerateHash() *Hash{
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, block.Index)
 	binary.Write(buf, binary.LittleEndian, block.PreviousHash)
 	binary.Write(buf, binary.LittleEndian, block.Timestamp)
 	binary.Write(buf, binary.LittleEndian, []byte(block.Data))
 
-	res := sha256.Sum256(buf.Bytes())
+
+	var res Hash = sha256.Sum256(buf.Bytes())
 	return &res
 }
 
 func GetGenesis() Block {
-	block := Block{Index: 0, PreviousHash: &[32]byte{}, Timestamp: 1502089655, Hash: &[32]byte{}, Data: "This is the genesis block!"}
-	block.Hash = block.GenerateHash()
+	block := Block{Index: 0, PreviousHash: [32]byte{}, Timestamp: 1502089655, Hash: [32]byte{}, Data: "This is the genesis block!"}
+
+	block.Hash = *block.GenerateHash()
 	return block
 }
 
 func (block *Block) IsValid() bool{
-	return(bytes.Equal(block.GenerateHash()[:], block.Hash[:]))
+	return bytes.Equal(block.GenerateHash()[:], block.Hash[:])
 }
 
 
