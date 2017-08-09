@@ -23,14 +23,14 @@ func (server *Server) Init(){
 		if isLocalhostOrPeer(*server, *request){
 			json.NewEncoder(writer).Encode(server.App.Blockchain)
 		}else {
-			json.NewEncoder(writer).Encode(Success{false, "Unauthorized"})
+			json.NewEncoder(writer).Encode(Success{false, &"Unauthorized"})
 		}
 	})
 	router.Methods("POST").Path("/mineBlock").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if isLocalhostOrPeer(*server, *request) {
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
-				json.NewEncoder(writer).Encode(Success{false, "An error occurred reading request body"})
+				json.NewEncoder(writer).Encode(Success{false, &"An error occurred reading request body"})
 				fmt.Println(err.Error())
 				return
 			}
@@ -39,7 +39,7 @@ func (server *Server) Init(){
 			json.NewEncoder(writer).Encode(Success{Success:true})
 			server.App.broadcast(block)
 		}else {
-			json.NewEncoder(writer).Encode(Success{false, "Unauthorized"})
+			json.NewEncoder(writer).Encode(Success{false, &"Unauthorized"})
 		}
 	})
 	router.Methods("POST").Path("/addBlock").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -47,22 +47,22 @@ func (server *Server) Init(){
 			block := types.Block{}
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
-				json.NewEncoder(writer).Encode(Success{false,"An error occurred reading request body"})
+				json.NewEncoder(writer).Encode(Success{false,&"An error occurred reading request body"})
 				fmt.Println(err.Error())
 				return
 			}
 			if err := json.Unmarshal(body, &block); err != nil {
-				json.NewEncoder(writer).Encode(Success{false,"An error occurred parsing request body"})
+				json.NewEncoder(writer).Encode(Success{false,&"An error occurred parsing request body"})
 				fmt.Println(err.Error())
 				return
 			}
 			if server.App.HasBlock(block){
-				json.NewEncoder(writer).Encode(Success{false,"Block already exists"})
+				json.NewEncoder(writer).Encode(Success{false,&"Block already exists"})
 				fmt.Println("Received block that already exists in db.")
 				return
 			}
 			if !block.IsValid() {
-				json.NewEncoder(writer).Encode(Success{false,"Received invalid block"})
+				json.NewEncoder(writer).Encode(Success{false,&"Received invalid block"})
 				fmt.Println("Received invalid block")
 				return
 			}
@@ -72,24 +72,24 @@ func (server *Server) Init(){
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
 				}else {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: "Invalid hash"})
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: &"Invalid hash"})
 				}
 			}else if uint32(len(server.App.Blockchain)) < block.Index {//block is in the future
 				RemoteChain := []types.Block{}
 				response, err := http.NewRequest("GET", server.App.Peers[request.RemoteAddr].getUrl() + "/blocks", nil)
 				if err != nil {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: &string(err.Error())})
 					fmt.Println(err.Error())
 					return
 				}
 				body, err := ioutil.ReadAll(response.Body)
 				if err != nil {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: &string(err.Error())})
 					fmt.Println(err.Error())
 					return
 				}
 				if err := json.Unmarshal(body, &RemoteChain); err != nil {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: &string(err.Error())})
 					fmt.Println(err.Error())
 					return
 				}
@@ -97,24 +97,24 @@ func (server *Server) Init(){
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
 				}else {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: "Peer has a longer chain"})
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: &"Peer has a longer chain"})
 				}
 			}
 		}else {
-			json.NewEncoder(writer).Encode(Success{Success: false, Error: "Unauthorized"})
+			json.NewEncoder(writer).Encode(Success{Success: false, Error: &"Unauthorized"})
 		}
 	})
 	router.Methods("POST").Path("/addPeer").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if isLocalhost(*request){
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
-				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
+				json.NewEncoder(writer).Encode(Success{Success: false, Error: &string(err.Error())})
 				fmt.Println(err.Error())
 				return
 			}
 			peer := Peer{}
 			if err := json.Unmarshal(body, &peer); err != nil {
-				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
+				json.NewEncoder(writer).Encode(Success{Success: false, Error: &string(err.Error())})
 				fmt.Println(err.Error())
 				return
 			}
@@ -146,5 +146,5 @@ func isLocalhost(req http.Request) bool{
 
 type Success struct {
 	Success bool `json:"success"`
-	Error string `json:"error"`
+	Error *string `json:"error"`
 }
