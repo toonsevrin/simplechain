@@ -14,7 +14,7 @@ import (
 type App struct {
 	Blockchain    []types.Block
 	Peers         map[string]*Peer //defined by url
-	PeerAddresses map[string]bool //defined by ip
+	PeerAddresses map[string]string //defined by ip, reference to url
 }
 
 func (app *App) createAndAddNextBlock(data string) types.Block {

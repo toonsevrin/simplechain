@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 	"os"
+	"google.golang.org/grpc/peer"
 )
 
 type Server struct {
@@ -75,9 +76,9 @@ func (server *Server) Init(){
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Invalid hash")})
 				}
 			} else if uint32(len(server.App.Blockchain)) < block.Index { //block is in the future
-				if peer , exists := server.App.Peers[request.RemoteAddr]; exists {
+				if url , exists := server.App.PeerAddresses[request.RemoteAddr]; exists {
 				RemoteChain := []types.Block{}
-				response, err := http.NewRequest("GET", peer.getUrl()+"/blocks", nil)
+				response, err := http.NewRequest("GET", url +"/blocks", nil)
 				if err != nil {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
 					fmt.Println(err.Error())
@@ -123,7 +124,7 @@ func (server *Server) Init(){
 				return
 			}
 			server.App.Peers[peer.getUrl()] = &peer
-			server.App.PeerAddresses[peer.Ip] = true
+			server.App.PeerAddresses[peer.Ip] = peer.getUrl()
 			json.NewEncoder(writer).Encode(Success{Success: true})
 		}else{
 			writer.Write([]byte("Only localhost can add peers"))
