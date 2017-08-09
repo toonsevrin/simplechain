@@ -19,7 +19,7 @@ type App struct {
 
 func (app *App) createAndAddNextBlock(data string) types.Block {
 	previous := app.getLatestBlock()
-	next := types.Block{Index: previous.Index, PreviousHash: previous.Hash, Timestamp: time.Now().Unix(), Hash: [32]byte{}, Data: data}
+	next := types.Block{Index: previous.Index + 1, PreviousHash: previous.Hash, Timestamp: time.Now().Unix(), Hash: [32]byte{}, Data: data}
 	next.Hash = *next.GenerateHash();
 	app.Blockchain = append(app.Blockchain, next)
 	return next
@@ -74,11 +74,13 @@ func (app *App) broadcast(block types.Block) {
 		panic(err.Error())
 	}
 	for _, peer := range app.Peers {
-		response, err := http.NewRequest("POST", peer.getUrl()+"/addBlock", bytes.NewReader(marshalled))
+		req, err := http.NewRequest("POST", peer.getUrl()+"/addBlock", bytes.NewReader(marshalled))
 		if err != nil {
 			log.Println(err.Error())
 			return
 		}
+		response := req.Response
+		
 		bytes, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			log.Println(err.Error())
