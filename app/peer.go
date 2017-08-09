@@ -6,5 +6,5 @@ type Peer struct {
 }
 
 func (peer *Peer) getUrl() string{
-	return "http" + peer.Ip + ":" + string(peer.Port)
+	return "http://" + peer.Ip + ":" + string(peer.Port)
 }
