@@ -72,37 +72,10 @@ func (server *Server) Init(){
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
 				} else {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Invalid hash")})
+					server.fixChain(writer, request)
 				}
 			} else if uint32(len(server.App.Blockchain)) < block.Index { //block is in the future
-				if url , exists := server.App.PeerAddresses[strings.Split(request.RemoteAddr, ":")[0]]; exists {
-				RemoteChain := []types.Block{}
-				response, err := http.NewRequest("GET", url +"/blocks", nil)
-				if err != nil {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
-					fmt.Println(err.Error())
-					return
-				}
-				body, err := ioutil.ReadAll(response.Body)
-				if err != nil {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
-					fmt.Println(err.Error())
-					return
-				}
-				if err := json.Unmarshal(body, &RemoteChain); err != nil {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
-					fmt.Println(err.Error())
-					return
-				}
-				if (server.App.pickLongestChain(RemoteChain)) {
-					json.NewEncoder(writer).Encode(Success{Success: true})
-					server.App.broadcast(block)
-				} else {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Peer has a longer chain")})
-				}
-			}else {
-					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Peer is not mutually tethered")})
-				}
+				server.fixChain(writer, request)
 		}
 		}else {
 			json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Unauthorized")})
@@ -130,6 +103,37 @@ func (server *Server) Init(){
 		}
 	})
 	http.ListenAndServe(":" + getPort(), router)
+}
+
+func (server *Server) fixChain(writer http.ResponseWriter, request *http.Request){
+	if url , exists := server.App.PeerAddresses[strings.Split(request.RemoteAddr, ":")[0]]; exists {
+		RemoteChain := []types.Block{}
+		response, err := http.NewRequest("GET", url +"/blocks", nil)
+		if err != nil {
+			json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
+			fmt.Println(err.Error())
+			return
+		}
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
+			fmt.Println(err.Error())
+			return
+		}
+		if err := json.Unmarshal(body, &RemoteChain); err != nil {
+			json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
+			fmt.Println(err.Error())
+			return
+		}
+		if (server.App.pickLongestChain(RemoteChain)) {
+			json.NewEncoder(writer).Encode(Success{Success: true})
+			server.App.broadcast(block)
+		} else {
+			json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Peer has a longer chain")})
+		}
+	}else {
+		json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Peer is not mutually tethered")})
+	}
 }
 func getPort() string{
 	port := os.Getenv("PORT")
