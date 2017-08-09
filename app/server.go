@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"fmt"
 	"strings"
+	"os"
 )
 
 type Server struct {
@@ -110,21 +111,29 @@ func (server *Server) Init(){
 			}
 			peer := Peer{}
 			if err := json.Unmarshal(body, peer); err != nil {
-				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())});
+				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
 				fmt.Println(err.Error())
 				return
 			}
 			server.App.Peers[peer.getUrl()] = &peer
 			server.App.PeerAddresses[peer.Ip] = true
-			json.NewEncoder(writer).Encode(Success{Success: true});
+			json.NewEncoder(writer).Encode(Success{Success: true})
 		}else{
 			writer.Write([]byte("Only localhost can add peers"))
 		}
 	})
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":" + getPort(), router)
+}
+func getPort() string{
+	port := os.Getenv("PORT")
+	if(port == ""){
+		return "8080"
+	}else {
+		return port
+	}
 }
 func isLocalhostOrPeer(server Server, request http.Request) bool{
-	_, isPeer := server.App.PeerAddresses[request.RemoteAddr];
+	_, isPeer := server.App.PeerAddresses[request.RemoteAddr]
 	return isPeer || isLocalhost(request)
 }
 func isLocalhost(req http.Request) bool{
