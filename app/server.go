@@ -43,40 +43,41 @@ func (server *Server) Init(){
 		}
 	})
 	router.Methods("POST").Path("/addBlock").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if isLocalhostOrPeer(*server, *request){
+		if isLocalhostOrPeer(*server, *request) {
 			block := types.Block{}
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
-				json.NewEncoder(writer).Encode(Success{false,str("An error occurred reading request body")})
+				json.NewEncoder(writer).Encode(Success{false, str("An error occurred reading request body")})
 				fmt.Println(err.Error())
 				return
 			}
 			if err := json.Unmarshal(body, &block); err != nil {
-				json.NewEncoder(writer).Encode(Success{false,str("An error occurred parsing request body")})
+				json.NewEncoder(writer).Encode(Success{false, str("An error occurred parsing request body")})
 				fmt.Println(err.Error())
 				return
 			}
-			if server.App.HasBlock(block){
-				json.NewEncoder(writer).Encode(Success{false,str("Block already exists")})
+			if server.App.HasBlock(block) {
+				json.NewEncoder(writer).Encode(Success{false, str("Block already exists")})
 				fmt.Println("Received block that already exists in db.")
 				return
 			}
 			if !block.IsValid() {
-				json.NewEncoder(writer).Encode(Success{false,str("Received invalid block")})
+				json.NewEncoder(writer).Encode(Success{false, str("Received invalid block")})
 				fmt.Println("Received invalid block")
 				return
 			}
-			if uint32(len(server.App.Blockchain)) == block.Index {//next block
-				if block.PreviousHash == server.App.getLatestBlock().Hash {//next block references your chain
+			if uint32(len(server.App.Blockchain)) == block.Index { //next block
+				if block.PreviousHash == server.App.getLatestBlock().Hash { //next block references your chain
 					server.App.AddBlock(block)
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
-				}else {
+				} else {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Invalid hash")})
 				}
-			}else if uint32(len(server.App.Blockchain)) < block.Index {//block is in the future
+			} else if uint32(len(server.App.Blockchain)) < block.Index { //block is in the future
+				if peer , exists := server.App.Peers[request.RemoteAddr]; exists {
 				RemoteChain := []types.Block{}
-				response, err := http.NewRequest("GET", server.App.Peers[request.RemoteAddr].getUrl() + "/blocks", nil)
+				response, err := http.NewRequest("GET", peer.getUrl()+"/blocks", nil)
 				if err != nil {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
 					fmt.Println(err.Error())
@@ -93,13 +94,16 @@ func (server *Server) Init(){
 					fmt.Println(err.Error())
 					return
 				}
-				if(server.App.pickLongestChain(RemoteChain)){
+				if (server.App.pickLongestChain(RemoteChain)) {
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
-				}else {
+				} else {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Peer has a longer chain")})
 				}
-			}
+			}else {
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Peer is not mutually tethered")})
+				}
+		}
 		}else {
 			json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Unauthorized")})
 		}
