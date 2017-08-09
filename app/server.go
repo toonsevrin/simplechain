@@ -113,7 +113,7 @@ func (server *Server) Init(){
 				log.Println(err.Error())
 				return
 			}
-			server.App.Peers[peer.getUrl()] = peer
+			server.App.Peers[peer.getUrl()] = &peer
 			server.App.PeerAddresses[peer.Ip] = true
 			json.NewEncoder(writer).Encode(Success{Success: true});
 		}else{
