@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"encoding/json"
-	"github.com/prometheus/common/log"
+	"log"
 	"io/ioutil"
 )
 
@@ -76,9 +76,9 @@ func (app *App) broadcast(block types.Block) {
 	for _, peer := range app.Peers {
 		response, err := http.NewRequest("POST", peer.getUrl()+"/addBlock", bytes.NewReader(marshalled))
 		if err != nil {
-			log.Error(err.Error())
+			log.Println(err.Error())
 		} else {
-			log.Debug("Response when sharing new block: " + string(ioutil.ReadAll(response.Body)))
+			log.Println("Response when sharing new block: " + string(ioutil.ReadAll(response.Body)))
 		}
 	}
 }
