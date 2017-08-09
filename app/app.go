@@ -13,7 +13,7 @@ import (
 
 type App struct {
 	Blockchain    []types.Block
-	Peers         map[string]Peer //defined by url
+	Peers         map[string]*Peer //defined by url
 	PeerAddresses map[string]bool //defined by ip
 }
 
@@ -77,8 +77,13 @@ func (app *App) broadcast(block types.Block) {
 		response, err := http.NewRequest("POST", peer.getUrl()+"/addBlock", bytes.NewReader(marshalled))
 		if err != nil {
 			log.Println(err.Error())
-		} else {
-			log.Println("Response when sharing new block: " + string(ioutil.ReadAll(response.Body)))
+			return
 		}
+		bytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		log.Println("Response when sharing new block: " + string(bytes))
 	}
 }
