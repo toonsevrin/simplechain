@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"fmt"
+	"strings"
 )
 
 type Server struct {
@@ -128,7 +129,7 @@ func isLocalhostOrPeer(server Server, request http.Request) bool{
 }
 func isLocalhost(req http.Request) bool{
 	fmt.Println(req.RemoteAddr)
-	return req.RemoteAddr == "127.0.0.1"
+	return strings.Contains(req.RemoteAddr, "127.0.0.1") || strings.Contains(req.RemoteAddr, "[::1]")//::1 is ipv6
 }
 
 type Success struct {
