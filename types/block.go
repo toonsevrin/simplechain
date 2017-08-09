@@ -7,11 +7,11 @@ import (
 )
 
 type Block struct {
-	Index uint32//32bit
-	PreviousHash Hash//256bit
-	Timestamp int64//64 bit
-	Hash Hash//256bit
-	Data string//unlimited
+	Index uint32 `json:"index"`//32bit
+	PreviousHash Hash `json:"previousHash"`//256bit
+	Timestamp int64 `json:"timestamp"`//64 bit
+	Hash Hash `json:"hash"`//256bit
+	Data string `json:"data"`//unlimited
 }
 
 
