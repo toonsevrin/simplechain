@@ -5,7 +5,7 @@ import (
 	appPkg "github.com/toonsevrin/simplechain/app"
 )
 func main() {
-	app := appPkg.App{Blockchain:[]types.Block{types.GetGenesis()},PeerAddresses:map[string]bool{}, Peers:map[string]*appPkg.Peer{}}
+	app := appPkg.App{Blockchain:[]types.Block{types.GetGenesis()},PeerAddresses:map[string]string{}, Peers:map[string]*appPkg.Peer{}}
 	server := appPkg.Server{app}
 	server.Init()
 }

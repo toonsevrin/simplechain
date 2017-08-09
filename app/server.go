@@ -75,7 +75,7 @@ func (server *Server) Init(){
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Invalid hash")})
 				}
 			} else if uint32(len(server.App.Blockchain)) < block.Index { //block is in the future
-				if url , exists := server.App.PeerAddresses[request.RemoteAddr]; exists {
+				if url , exists := server.App.PeerAddresses[strings.Split(request.RemoteAddr, ":")[0]]; exists {
 				RemoteChain := []types.Block{}
 				response, err := http.NewRequest("GET", url +"/blocks", nil)
 				if err != nil {
