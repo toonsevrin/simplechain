@@ -72,10 +72,10 @@ func (server *Server) Init(){
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
 				} else {
-					server.fixChain(writer, request)
+					server.fixChain(block, writer, request)
 				}
 			} else if uint32(len(server.App.Blockchain)) < block.Index { //block is in the future
-				server.fixChain(writer, request)
+				server.fixChain(block, writer, request)
 		}
 		}else {
 			json.NewEncoder(writer).Encode(Success{Success: false, Error: str("Unauthorized")})
@@ -105,7 +105,7 @@ func (server *Server) Init(){
 	http.ListenAndServe(":" + getPort(), router)
 }
 
-func (server *Server) fixChain(writer http.ResponseWriter, request *http.Request){
+func (server *Server) fixChain(block types.Block, writer http.ResponseWriter, request *http.Request){
 	if url , exists := server.App.PeerAddresses[strings.Split(request.RemoteAddr, ":")[0]]; exists {
 		RemoteChain := []types.Block{}
 		response, err := http.NewRequest("GET", url +"/blocks", nil)
