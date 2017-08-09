@@ -39,7 +39,7 @@ func (server *Server) Init(){
 			json.NewEncoder(writer).Encode(Success{Success:true})
 			server.App.broadcast(block)
 		}else {
-			json.NewEncoder(writer).Encode(Success{false, str("Unauthorized"})
+			json.NewEncoder(writer).Encode(Success{false, str("Unauthorized")})
 		}
 	})
 	router.Methods("POST").Path("/addBlock").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
