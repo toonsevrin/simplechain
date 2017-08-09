@@ -108,9 +108,15 @@ func (server *Server) Init(){
 func (server *Server) fixChain(block types.Block, writer http.ResponseWriter, request *http.Request){
 	if url , exists := server.App.PeerAddresses[strings.Split(request.RemoteAddr, ":")[0]]; exists {
 		RemoteChain := []types.Block{}
-		response, err := http.NewRequest("GET", url +"/blocks", nil)
+		req, err := http.NewRequest("GET", url +"/blocks", nil)
 		if err != nil {
 			json.NewEncoder(writer).Encode(Success{Success: false, Error: str(err.Error())})
+			fmt.Println(err.Error())
+			return
+		}
+		client := &http.Client{}
+		response, err := client.Do(req)
+		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}

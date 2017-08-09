@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"encoding/json"
-	"log"
 	"io/ioutil"
 )
 
@@ -76,21 +75,21 @@ func (app *App) broadcast(block types.Block) {
 	for _, peer := range app.Peers {
 		req, err := http.NewRequest("POST", peer.getUrl()+"/addBlock", bytes.NewReader(marshalled))
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 			return
 		}
 		client := &http.Client{}
 		response, err := client.Do(req)
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 			return
 		}
 
 		bytes, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 			return
 		}
-		log.Println("Response when sharing new block: " + string(bytes))
+		fmt.Println("Response when sharing new block: " + string(bytes))
 	}
 }
