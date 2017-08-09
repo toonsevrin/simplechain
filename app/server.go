@@ -7,7 +7,7 @@ import (
 
 	"encoding/json"
 	"io/ioutil"
-	"log"
+	"fmt"
 )
 
 type Server struct {
@@ -29,14 +29,14 @@ func (server *Server) Init(){
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				json.NewEncoder(writer).Encode(Success{false, "An error occurred reading request body"})
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 				return
 			}
 			data := string(body)
 			block := server.App.createAndAddNextBlock(data)
 			json.NewEncoder(writer).Encode(Success{Success:true})
 			server.App.broadcast(block)
-			log.Println("log")
+			fmt.Println("log")
 		}else {
 			json.NewEncoder(writer).Encode(Success{false, "Unauthorized"})
 		}
@@ -47,7 +47,7 @@ func (server *Server) Init(){
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				json.NewEncoder(writer).Encode(Success{false,"An error occurred reading request body"})
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 				return
 			}
 			if err := json.Unmarshal(body, block); err != nil {
@@ -57,12 +57,12 @@ func (server *Server) Init(){
 			}
 			if server.App.HasBlock(block){
 				json.NewEncoder(writer).Encode(Success{false,"Block already exists"})
-				log.Println("Received block that already exists in db.")
+				fmt.Println("Received block that already exists in db.")
 				return
 			}
 			if !block.IsValid() {
 				json.NewEncoder(writer).Encode(Success{false,"Received invalid block"})
-				log.Println("Received invalid block")
+				fmt.Println("Received invalid block")
 				return
 			}
 			if uint32(len(server.App.Blockchain)) == block.Index {//next block
@@ -76,18 +76,18 @@ func (server *Server) Init(){
 				response, err := http.NewRequest("GET", server.App.Peers[request.RemoteAddr].getUrl() + "/blocks", nil)
 				if err != nil {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
-					log.Println(err.Error())
+					fmt.Println(err.Error())
 					return
 				}
 				body, err := ioutil.ReadAll(response.Body)
 				if err != nil {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
-					log.Println(err.Error())
+					fmt.Println(err.Error())
 					return
 				}
 				if err := json.Unmarshal(body, RemoteChain); err != nil {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
-					log.Println(err.Error())
+					fmt.Println(err.Error())
 					return
 				}
 				if(server.App.pickLongestChain(RemoteChain)){
@@ -104,13 +104,13 @@ func (server *Server) Init(){
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 				return
 			}
 			peer := Peer{}
 			if err := json.Unmarshal(body, peer); err != nil {
 				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())});
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 				return
 			}
 			server.App.Peers[peer.getUrl()] = &peer
@@ -127,6 +127,7 @@ func isLocalhostOrPeer(server Server, request http.Request) bool{
 	return isPeer || isLocalhost(request)
 }
 func isLocalhost(req http.Request) bool{
+	fmt.Println(req.RemoteAddr)
 	return req.RemoteAddr == "127.0.0.1"
 }
 
