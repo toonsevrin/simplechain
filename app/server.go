@@ -52,7 +52,7 @@ func (server *Server) Init(){
 			}
 			if err := json.Unmarshal(body, block); err != nil {
 				json.NewEncoder(writer).Encode(Success{false,"An error occurred parsing request body"})
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 				return
 			}
 			if server.App.HasBlock(block){
