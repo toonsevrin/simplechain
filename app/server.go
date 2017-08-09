@@ -71,6 +71,8 @@ func (server *Server) Init(){
 					server.App.AddBlock(block)
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
+				}else {
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: "Invalid hash"})
 				}
 			}else if uint32(len(server.App.Blockchain)) < block.Index {//block is in the future
 				RemoteChain := []types.Block{}
@@ -94,6 +96,8 @@ func (server *Server) Init(){
 				if(server.App.pickLongestChain(RemoteChain)){
 					json.NewEncoder(writer).Encode(Success{Success: true})
 					server.App.broadcast(block)
+				}else {
+					json.NewEncoder(writer).Encode(Success{Success: false, Error: "Peer has a longer chain"})
 				}
 			}
 		}else {
