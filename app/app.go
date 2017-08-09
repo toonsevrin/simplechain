@@ -21,7 +21,7 @@ func (app *App) createAndAddNextBlock(data string) types.Block {
 	previous := app.getLatestBlock()
 	next := types.Block{Index: previous.Index, PreviousHash: previous.Hash, Timestamp: time.Now().Unix(), Hash: [32]byte{}, Data: data}
 	next.Hash = *next.GenerateHash();
-	app.Blockchain[len(app.Blockchain)] = next
+	app.Blockchain = append(app.Blockchain, next)
 	return next
 }
 func (app *App) HasBlock(block types.Block) bool {
