@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"strings"
 	"os"
-	"google.golang.org/grpc/peer"
 )
 
 type Server struct {
