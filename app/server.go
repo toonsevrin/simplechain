@@ -23,14 +23,14 @@ func (server *Server) Init(){
 		if isLocalhostOrPeer(*server, *request){
 			json.NewEncoder(writer).Encode(server.App.Blockchain)
 		}else {
-			json.NewEncoder(writer).Encode(Success{false, &"Unauthorized"})
+			json.NewEncoder(writer).Encode(Success{false, &string("Unauthorized")})
 		}
 	})
 	router.Methods("POST").Path("/mineBlock").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if isLocalhostOrPeer(*server, *request) {
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
-				json.NewEncoder(writer).Encode(Success{false, &"An error occurred reading request body"})
+				json.NewEncoder(writer).Encode(Success{false, &string("An error occurred reading request body")})
 				fmt.Println(err.Error())
 				return
 			}
