@@ -38,7 +38,6 @@ func (server *Server) Init(){
 			block := server.App.createAndAddNextBlock(data)
 			json.NewEncoder(writer).Encode(Success{Success:true})
 			server.App.broadcast(block)
-			fmt.Println("log")
 		}else {
 			json.NewEncoder(writer).Encode(Success{false, "Unauthorized"})
 		}
@@ -52,7 +51,7 @@ func (server *Server) Init(){
 				fmt.Println(err.Error())
 				return
 			}
-			if err := json.Unmarshal(body, block); err != nil {
+			if err := json.Unmarshal(body, &block); err != nil {
 				json.NewEncoder(writer).Encode(Success{false,"An error occurred parsing request body"})
 				fmt.Println(err.Error())
 				return
@@ -87,7 +86,7 @@ func (server *Server) Init(){
 					fmt.Println(err.Error())
 					return
 				}
-				if err := json.Unmarshal(body, RemoteChain); err != nil {
+				if err := json.Unmarshal(body, &RemoteChain); err != nil {
 					json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
 					fmt.Println(err.Error())
 					return
@@ -110,7 +109,7 @@ func (server *Server) Init(){
 				return
 			}
 			peer := Peer{}
-			if err := json.Unmarshal(body, peer); err != nil {
+			if err := json.Unmarshal(body, &peer); err != nil {
 				json.NewEncoder(writer).Encode(Success{Success: false, Error: string(err.Error())})
 				fmt.Println(err.Error())
 				return
